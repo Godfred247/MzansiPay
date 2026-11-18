@@ -481,6 +481,10 @@ export function SettingsPage() {
   return (
     <div className="space-y-6">
       <PageHeader eyebrow={org.tradingName} title="Organisation settings" description="Company details, roles, security and the audit history." />
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-line bg-white px-4 py-3">
+        <p className="text-sm text-muted">Organisation setup can be saved and finished later. It does not change the sample payroll already on file.</p>
+        <ButtonLink to="/setup" variant="secondary">Open organisation setup</ButtonLink>
+      </div>
       <Tabs
         value={tab}
         onChange={setTab}

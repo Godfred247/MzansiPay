@@ -40,6 +40,54 @@ import {
 } from "./pages/Mobile.tsx";
 import { PayrollListPage, PayrollRunPage } from "./pages/Payroll.tsx";
 import { PayslipPage, PayslipsPage } from "./pages/Payslips.tsx";
+import { AccountTypePage, ForgotPasswordPage, MfaPage, ResetPasswordPage, SignUpPage, VerifyPage } from "./onboarding/auth.tsx";
+import {
+  AccountantCheckoutPage,
+  AccountantContactPage,
+  AccountantPlanPage,
+  AccountantProfilePage,
+  AccountantRegistrationPage,
+  AccountantTeamPage,
+  AccountantWelcomePage,
+} from "./onboarding/accountant.tsx";
+import {
+  AcceptInvitationPage,
+  EmployeeAccountPage,
+  EmployeeConfirmPage,
+  EmployeeMfaPage,
+  EmployeePasswordPage,
+  EmployeeProfilePage as InvitationProfilePage,
+  EmployeeVerifyPage,
+  EmployeeWelcomePage,
+  InvitationEmailPage,
+} from "./onboarding/employee.tsx";
+import {
+  EmployerAddressPage,
+  EmployerCheckoutPage,
+  EmployerCompanyPage,
+  EmployerConfirmedPage,
+  EmployerFrequenciesPage,
+  EmployerOrganisationPage,
+  EmployerPeriodPage,
+  EmployerPlanPage,
+  EmployerRegistrationPage,
+  EmployerStatutoryPage,
+  EmployerWelcomePage,
+} from "./onboarding/employer.tsx";
+import { AccountantLandingPage, LandingPage } from "./onboarding/public.tsx";
+import {
+  SetupHubPage,
+  WizardAdminsPage,
+  WizardBranchesPage,
+  WizardCompanyPage,
+  WizardEarningsPage,
+  WizardFrequencyPage,
+  WizardLeavePage,
+  WizardPayDatesPage,
+  WizardReviewPage,
+  WizardTaxPage,
+  WizardYearPage,
+} from "./onboarding/wizard.tsx";
 import { SignIn } from "./pages/SignIn.tsx";
 import { BenefitsPage, EarningsPage } from "./pages/SetupPages.tsx";
 import { EmployerShell, PracticeShell } from "./shells.tsx";
@@ -92,7 +140,54 @@ function AccountantClientLayout() {
 export default function App() {
   return (
     <Routes>
-      <Route path="/" element={<SignIn />} />
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/accountants" element={<AccountantLandingPage />} />
+      <Route path="/login" element={<SignIn />} />
+      <Route path="/signup" element={<SignUpPage kind="employer" />} />
+      <Route path="/accountants/signup" element={<SignUpPage kind="accountant" />} />
+      <Route path="/verify" element={<VerifyPage />} />
+      <Route path="/forgot" element={<ForgotPasswordPage />} />
+      <Route path="/reset" element={<ResetPasswordPage />} />
+      <Route path="/mfa" element={<MfaPage />} />
+      <Route path="/start/account-type" element={<AccountTypePage />} />
+      <Route path="/start/employer/organisation" element={<EmployerOrganisationPage />} />
+      <Route path="/start/employer/company" element={<EmployerCompanyPage />} />
+      <Route path="/start/employer/registration" element={<EmployerRegistrationPage />} />
+      <Route path="/start/employer/statutory" element={<EmployerStatutoryPage />} />
+      <Route path="/start/employer/address" element={<EmployerAddressPage />} />
+      <Route path="/start/employer/frequencies" element={<EmployerFrequenciesPage />} />
+      <Route path="/start/employer/period" element={<EmployerPeriodPage />} />
+      <Route path="/start/employer/plan" element={<EmployerPlanPage />} />
+      <Route path="/start/employer/checkout" element={<EmployerCheckoutPage />} />
+      <Route path="/start/employer/confirmed" element={<EmployerConfirmedPage />} />
+      <Route path="/start/employer/welcome" element={<EmployerWelcomePage />} />
+      <Route path="/start/accountant/practice" element={<AccountantProfilePage />} />
+      <Route path="/start/accountant/registration" element={<AccountantRegistrationPage />} />
+      <Route path="/start/accountant/contact" element={<AccountantContactPage />} />
+      <Route path="/start/accountant/team" element={<AccountantTeamPage />} />
+      <Route path="/start/accountant/plan" element={<AccountantPlanPage />} />
+      <Route path="/start/accountant/checkout" element={<AccountantCheckoutPage />} />
+      <Route path="/start/accountant/welcome" element={<AccountantWelcomePage />} />
+      <Route path="/invite" element={<InvitationEmailPage />} />
+      <Route path="/invite/accept" element={<AcceptInvitationPage />} />
+      <Route path="/invite/account" element={<EmployeeAccountPage />} />
+      <Route path="/invite/verify" element={<EmployeeVerifyPage />} />
+      <Route path="/invite/password" element={<EmployeePasswordPage />} />
+      <Route path="/invite/mfa" element={<EmployeeMfaPage />} />
+      <Route path="/invite/profile" element={<InvitationProfilePage />} />
+      <Route path="/invite/confirm" element={<EmployeeConfirmPage />} />
+      <Route path="/invite/welcome" element={<EmployeeWelcomePage />} />
+      <Route path="/setup" element={<SetupHubPage />} />
+      <Route path="/setup/company" element={<WizardCompanyPage />} />
+      <Route path="/setup/tax" element={<WizardTaxPage />} />
+      <Route path="/setup/branches" element={<WizardBranchesPage />} />
+      <Route path="/setup/frequency" element={<WizardFrequencyPage />} />
+      <Route path="/setup/pay-dates" element={<WizardPayDatesPage />} />
+      <Route path="/setup/year" element={<WizardYearPage />} />
+      <Route path="/setup/leave" element={<WizardLeavePage />} />
+      <Route path="/setup/earnings" element={<WizardEarningsPage />} />
+      <Route path="/setup/admins" element={<WizardAdminsPage />} />
+      <Route path="/setup/review" element={<WizardReviewPage />} />
       <Route path="/design-system" element={<DesignSystemPage />} />
       <Route path="/e" element={<EmployerShell />}>
         {EmployerRoutes()}

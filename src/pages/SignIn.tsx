@@ -1,7 +1,8 @@
 import { useState, type FormEvent } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import type { OrgId } from "../domain.ts";
 import { DEMO_DATE_LONG, DEMO_TIME } from "../format.ts";
+import { useOnboarding } from "../onboarding/context.tsx";
 import { useApp } from "../state.tsx";
 import { Button, Field, Input, Mark, usePageTitle } from "../ui.tsx";
 
@@ -16,6 +17,8 @@ export function SignIn() {
   usePageTitle("Sign in");
   const navigate = useNavigate();
   const { dispatch } = useApp();
+  const { state: onboarding } = useOnboarding();
+  const savedSetup = Boolean(onboarding.wizard.savedAt || onboarding.wizard.companyTrading);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState<{ email?: string; password?: string; form?: string }>({});
@@ -92,6 +95,13 @@ export function SignIn() {
               Continue
             </Button>
           </form>
+          <div className="mt-4 flex flex-col gap-2 text-sm">
+            <Link className="font-medium text-blue-700" to="/forgot">Forgot password</Link>
+            <Link className="font-medium text-blue-700" to="/signup">Create an employer account</Link>
+            <Link className="font-medium text-blue-700" to="/accountants/signup">Register an accounting practice</Link>
+            <Link className="font-medium text-blue-700" to="/invite">Preview an employee invitation</Link>
+            {savedSetup ? <Link className="font-medium text-blue-700" to="/setup">Continue organisation setup</Link> : null}
+          </div>
           <div className="mt-8">
             <p className="text-xs font-medium tracking-wide text-muted uppercase">Demonstration profiles</p>
             <div className="mt-3 space-y-2">
@@ -112,9 +122,13 @@ export function SignIn() {
             </div>
           </div>
           <p className="mt-6 text-sm text-muted">
-            <a className="font-medium text-blue-700" href="/design-system">
+            <Link className="font-medium text-blue-700" to="/">
+              Back to the public site
+            </Link>
+            <span className="mx-2">·</span>
+            <Link className="font-medium text-blue-700" to="/design-system">
               View the design system
-            </a>
+            </Link>
           </p>
         </div>
       </section>

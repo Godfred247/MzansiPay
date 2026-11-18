@@ -130,18 +130,21 @@ export function Field({
   htmlFor,
   hint,
   error,
+  required,
   children,
 }: {
   label: string;
   htmlFor: string;
   hint?: string;
   error?: string;
+  required?: boolean;
   children: ReactNode;
 }) {
   return (
     <div className="space-y-1.5">
       <label htmlFor={htmlFor} className="block text-sm font-medium text-ink">
         {label}
+        {required ? <span className="ml-1.5 text-xs font-medium text-red-700">Required</span> : null}
       </label>
       {children}
       {error ? (
