@@ -376,7 +376,7 @@ export function PaymentsPage() {
 export function DocumentsPage() {
   const { documents, employees, org, orgId } = useOrg();
   const { dispatch } = useApp();
-  const { actor } = useWorkspace();
+  const { actor, base } = useWorkspace();
   const [owner, setOwner] = useState("all");
   const [pending, setPending] = useState<string | null>(null);
   const [name, setName] = useState("");
@@ -440,9 +440,10 @@ export function DocumentsPage() {
                       {document.category} · Updated {formatDate(document.updated)}
                     </p>
                   </div>
-                  <Button size="sm" variant="secondary" onClick={() => setPending(document.id)}>
-                    Prepare download
-                  </Button>
+                  <div className="flex gap-2">
+                    <ButtonLink to={`${base}/documents/${document.id}`} size="sm" variant="secondary">Preview</ButtonLink>
+                    <Button size="sm" variant="secondary" onClick={() => setPending(document.id)}>Prepare download</Button>
+                  </div>
                 </div>
               </Card>
             ))

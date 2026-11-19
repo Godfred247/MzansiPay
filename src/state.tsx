@@ -64,6 +64,7 @@ type Action =
   | { type: "decide-leave"; id: string; decision: "approved" | "declined"; note: string; actor: string }
   | { type: "add-leave"; request: LeaveRequest; actor: string }
   | { type: "add-employee"; employee: Employee; actor: string }
+  | { type: "terminate-employee"; employeeId: string; endDate: string; reason: string; actor: string }
   | { type: "add-code"; code: PayCode; actor: string }
   | { type: "deactivate-code"; id: string; actor: string }
   | { type: "add-user"; user: OrgUser; actor: string }
@@ -340,6 +341,18 @@ function reducer(state: State, action: Action): State {
           orgId: action.employee.orgId,
         },
       );
+    case "terminate-employee": {
+      const employee = state.employees.find((item) => item.id === action.employeeId);
+      if (!employee || employee.status === "terminated") return state;
+      return note(
+        {
+          ...state,
+          employees: state.employees.map((item) => (item.id === employee.id ? { ...item, status: "terminated", endDate: action.endDate } : item)),
+        },
+        `${employee.firstName} ${employee.lastName} is now on the archived register.`,
+        { actor: action.actor, action: "Archived employee", detail: `${employee.firstName} ${employee.lastName}. ${action.reason}`, orgId: employee.orgId },
+      );
+    }
     case "add-code":
       return note(
         { ...state, codes: [...state.codes, action.code] },

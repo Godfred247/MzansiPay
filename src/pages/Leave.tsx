@@ -4,11 +4,12 @@ import { formatDate } from "../format.ts";
 import { useApp, useOrg } from "../state.tsx";
 import { useWorkspace } from "../workspace.ts";
 import { Badge, Button, Card, ConfirmDialog, DataTable, EmptyState, Field, PageHeader, Textarea } from "../ui.tsx";
+import { SectionLinks } from "../visuals.tsx";
 
 export function LeavePage() {
   const { leave, employees, org } = useOrg();
   const { dispatch } = useApp();
-  const { actor } = useWorkspace();
+  const { actor, base } = useWorkspace();
   const [decision, setDecision] = useState<{ id: string; type: "approved" | "declined" } | null>(null);
   const [note, setNote] = useState("");
   const [error, setError] = useState("");
@@ -22,6 +23,7 @@ export function LeavePage() {
   return (
     <div className="space-y-6">
       <PageHeader eyebrow={org.tradingName} title="Leave" description="Annual, sick and family responsibility balances are the sample company's records." />
+      <SectionLinks items={[{ to: `${base}/leave`, label: "Queue" }, { to: `${base}/leave/calendar`, label: "Calendar" }, { to: `${base}/leave/types`, label: "Types and accrual" }]} />
       {employees.length === 0 ? (
         <EmptyState title="No leave records" body="Leave balances appear after employees are added." />
       ) : (

@@ -16,7 +16,7 @@ import {
 } from "./pages/AccountantPages.tsx";
 import { DashboardPage } from "./pages/Dashboard.tsx";
 import { DesignSystemPage } from "./pages/DesignSystem.tsx";
-import { EmployeeProfilePage, EmployeesPage, NewEmployeePage } from "./pages/Employees.tsx";
+import { ArchivedEmployeesPage, EmployeeProfilePage, EmployeesPage, NewEmployeePage, TerminateEmployeePage } from "./pages/Employees.tsx";
 import { LeavePage } from "./pages/Leave.tsx";
 import {
   EmployeeDocuments,
@@ -38,6 +38,29 @@ import {
   MobileMoneyList,
   MobilePayslips,
 } from "./pages/Mobile.tsx";
+import {
+  ApprovalDetailPage,
+  ApprovalQueuePage,
+  DocumentPreviewPage,
+  LeaveCalendarPage,
+  LeaveTypesPage,
+  PayrollCalendarPage,
+  PayrollComparePage,
+  PayrollCreatePage,
+  PayrollEmployeeCalcPage,
+  PayrollExceptionsPage,
+  PayrollFinalPage,
+  PayrollGroupCreatePage,
+  PayrollGroupsPage,
+  PayrollHistoryPage,
+  PayrollPendingPage,
+  PayrollRejectedPage,
+  PayrollSubmitPage,
+  PayrollValidatePage,
+  StructureCreatePage,
+  StructureDetailPage,
+  StructuresPage,
+} from "./pages/EmployerOps.tsx";
 import { PayrollListPage, PayrollRunPage } from "./pages/Payroll.tsx";
 import { PayslipPage, PayslipsPage } from "./pages/Payslips.tsx";
 import { AccountTypePage, ForgotPasswordPage, MfaPage, ResetPasswordPage, SignUpPage, VerifyPage } from "./onboarding/auth.tsx";
@@ -99,13 +122,35 @@ function EmployerRoutes() {
     <>
       <Route index element={<DashboardPage />} />
       <Route path="employees" element={<EmployeesPage />} />
+      <Route path="employees/archived" element={<ArchivedEmployeesPage />} />
       <Route path="employees/new" element={<NewEmployeePage />} />
+      <Route path="employees/:employeeId/terminate" element={<TerminateEmployeePage />} />
       <Route path="employees/:employeeId" element={<EmployeeProfilePage />} />
+      <Route path="structures" element={<StructuresPage />} />
+      <Route path="structures/new" element={<StructureCreatePage />} />
+      <Route path="structures/:structureId" element={<StructureDetailPage />} />
       <Route path="payroll" element={<PayrollListPage />} />
+      <Route path="payroll/groups" element={<PayrollGroupsPage />} />
+      <Route path="payroll/groups/new" element={<PayrollGroupCreatePage />} />
+      <Route path="payroll/calendar" element={<PayrollCalendarPage />} />
+      <Route path="payroll/new" element={<PayrollCreatePage />} />
+      <Route path="payroll/history" element={<PayrollHistoryPage />} />
+      <Route path="payroll/pending" element={<PayrollPendingPage />} />
+      <Route path="payroll/rejected" element={<PayrollRejectedPage />} />
+      <Route path="payroll/final" element={<PayrollFinalPage />} />
+      <Route path="payroll/:runId/employee/:employeeId" element={<PayrollEmployeeCalcPage />} />
+      <Route path="payroll/:runId/validate" element={<PayrollValidatePage />} />
+      <Route path="payroll/:runId/exceptions" element={<PayrollExceptionsPage />} />
+      <Route path="payroll/:runId/compare" element={<PayrollComparePage />} />
+      <Route path="payroll/:runId/submit" element={<PayrollSubmitPage />} />
       <Route path="payroll/:runId" element={<PayrollRunPage />} />
+      <Route path="approvals" element={<ApprovalQueuePage />} />
+      <Route path="approvals/:runId" element={<ApprovalDetailPage />} />
       <Route path="payslips" element={<PayslipsPage />} />
       <Route path="payslips/:payslipId" element={<PayslipPage />} />
       <Route path="leave" element={<LeavePage />} />
+      <Route path="leave/calendar" element={<LeaveCalendarPage />} />
+      <Route path="leave/types" element={<LeaveTypesPage />} />
       <Route path="earnings" element={<EarningsPage />} />
       <Route path="benefits" element={<BenefitsPage />} />
       <Route path="compliance" element={<CompliancePage />} />
@@ -113,6 +158,7 @@ function EmployerRoutes() {
       <Route path="reports/:reportId" element={<ReportViewPage />} />
       <Route path="payments" element={<PaymentsPage />} />
       <Route path="documents" element={<DocumentsPage />} />
+      <Route path="documents/:docId" element={<DocumentPreviewPage />} />
       <Route path="settings" element={<SettingsPage />} />
       <Route path="billing" element={<BillingPage />} />
     </>

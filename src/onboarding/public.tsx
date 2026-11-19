@@ -47,6 +47,31 @@ export function LandingPage() {
         </div>
       </section>
 
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-6xl items-center gap-8 px-4 py-14 lg:grid-cols-2 lg:px-6">
+          <img src="/brand/payroll-desk.jpg" alt="Two colleagues in a Johannesburg office reviewing a printed payslip beside a payroll chart" className="h-80 w-full rounded-2xl object-cover" />
+          <div>
+            <h2 className="text-2xl font-semibold tracking-tight">A month of pay, in the order a reviewer reads it</h2>
+            <ol className="mt-6 space-y-4">
+              {[
+                ["1", "Cutoff", "Hours, leave and once-off amounts stop arriving."],
+                ["2", "Review", "Gross, employee deductions and employer contributions stay in separate groups."],
+                ["3", "Approve", "The employer approves. A practice can prepare the file, not release it."],
+                ["4", "Pay and file", "Payslips open for employees. The EMP201 worksheet is prepared, not submitted."],
+              ].map(([step, title, body]) => (
+                <li key={step} className="flex gap-4">
+                  <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-navy text-sm font-semibold text-white">{step}</span>
+                  <span>
+                    <span className="block text-sm font-semibold">{title}</span>
+                    <span className="mt-1 block text-sm leading-6 text-muted">{body}</span>
+                  </span>
+                </li>
+              ))}
+            </ol>
+          </div>
+        </div>
+      </section>
+
       <section id="employers" className="mx-auto max-w-6xl px-4 py-14 lg:px-6">
         <h2 className="text-2xl font-semibold tracking-tight">Three ways into the product</h2>
         <div className="mt-6 grid gap-4 lg:grid-cols-3">

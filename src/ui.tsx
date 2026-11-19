@@ -411,7 +411,7 @@ export function DataTable<T>({
   columns,
   getId,
   loading,
-  empty,
+  empty = "Nothing to show.",
   pageSize = 6,
   selectable,
   bulkLabel,
@@ -422,7 +422,7 @@ export function DataTable<T>({
   columns: Column<T>[];
   getId: (row: T) => string;
   loading?: boolean;
-  empty: ReactNode;
+  empty?: ReactNode;
   pageSize?: number;
   selectable?: boolean;
   bulkLabel?: string;

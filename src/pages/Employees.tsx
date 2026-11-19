@@ -9,14 +9,18 @@ import { useShellLoading } from "../shells.tsx";
 import { useWorkspace } from "../workspace.ts";
 import { Badge, Button, ButtonLink, Card, CardTitle, ConfirmDialog, DataTable, DefinitionList, EmptyState, ErrorState, Field, Input, PageHeader, Select, Tabs } from "../ui.tsx";
 
-export function EmployeesPage() {
+export function ArchivedEmployeesPage() {
+  return <EmployeesPage archived />;
+}
+
+export function EmployeesPage({ archived = false }: { archived?: boolean }) {
   const loading = useShellLoading();
   const { employees, org } = useOrg();
   const { base } = useWorkspace();
   const [query, setQuery] = useState("");
   const [department, setDepartment] = useState("all");
   const [frequency, setFrequency] = useState("all");
-  const [status, setStatus] = useState("all");
+  const [status, setStatus] = useState(archived ? "terminated" : "all");
   const departments = [...new Set(employees.map((employee) => employee.department))];
   const filtered = employees.filter((employee) => {
     const haystack = `${fullName(employee)} ${employee.employeeNumber} ${employee.jobTitle}`.toLowerCase();
@@ -50,14 +54,13 @@ export function EmployeesPage() {
     <div className="space-y-6">
       <PageHeader
         eyebrow={org.tradingName}
-        title="Employees"
-        description="People paid by this organisation. Identity numbers and bank accounts stay masked."
+        title={archived ? "Archived employees" : "Employees"}
+        description={archived ? "Employment has ended. Payslips stay available to payroll administrators. Identity numbers stay masked." : "People paid by this organisation. Identity numbers and bank accounts stay masked."}
         actions={
           <>
-            <Button variant="secondary" onClick={() => exportRows()}>
-              Export
-            </Button>
-            <ButtonLink to={`${base}/employees/new`}>Add employee</ButtonLink>
+            <Button variant="secondary" onClick={() => exportRows()}>Export</Button>
+            {archived ? <ButtonLink to={`${base}/employees`} variant="secondary">Active directory</ButtonLink> : <ButtonLink to={`${base}/employees/archived`} variant="secondary">Archived</ButtonLink>}
+            {archived ? null : <ButtonLink to={`${base}/employees/new`}>Add employee</ButtonLink>}
           </>
         }
       />
@@ -166,6 +169,8 @@ export function NewEmployeePage() {
     account: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
+  const [step, setStep] = useState(0);
+  const steps = ["Personal", "Contact", "Employment", "Salary", "Bank", "Review"];
 
   function set<K extends keyof typeof form>(key: K, value: (typeof form)[K]) {
     setForm((current) => ({ ...current, [key]: value }));
@@ -217,10 +222,15 @@ export function NewEmployeePage() {
 
   return (
     <div className="mx-auto max-w-3xl space-y-6">
-      <PageHeader eyebrow={orgId === "moloto" ? "Moloto Studio" : "Khanyisa Retail"} title="Add employee" description="Required employment and pay details. A full identity number is not collected on this screen." />
+      <PageHeader eyebrow={orgId === "moloto" ? "Moloto Studio" : "Khanyisa Retail"} title="Add employee" description={`Step ${step + 1} of ${steps.length}: ${steps[step]}. A full identity number is not collected.`} />
+      <ol className="flex gap-2 overflow-x-auto text-sm">
+        {steps.map((label, index) => (
+          <li key={label} className={`shrink-0 rounded-full px-3 py-1 ${index === step ? "bg-blue-600 text-white" : index < step ? "bg-teal-50 text-teal-800" : "bg-white text-muted"}`}>{label}</li>
+        ))}
+      </ol>
       <form className="space-y-6" onSubmit={onSubmit} noValidate>
-        <Card>
-          <CardTitle title="Personal" />
+        {step === 0 ? <Card>
+          <CardTitle title="Personal details" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="First name" htmlFor="firstName" error={errors.firstName}>
               <Input id="firstName" invalid={Boolean(errors.firstName)} value={form.firstName} onChange={(event) => set("firstName", event.target.value)} />
@@ -228,6 +238,11 @@ export function NewEmployeePage() {
             <Field label="Last name" htmlFor="lastName" error={errors.lastName}>
               <Input id="lastName" invalid={Boolean(errors.lastName)} value={form.lastName} onChange={(event) => set("lastName", event.target.value)} />
             </Field>
+            </div>
+        </Card> : null}
+        {step === 1 ? <Card>
+          <CardTitle title="Contact details" />
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Work email" htmlFor="email" error={errors.email}>
               <Input id="email" type="email" invalid={Boolean(errors.email)} value={form.email} onChange={(event) => set("email", event.target.value)} />
             </Field>
@@ -235,9 +250,9 @@ export function NewEmployeePage() {
               <Input id="mobile" invalid={Boolean(errors.mobile)} value={form.mobile} onChange={(event) => set("mobile", event.target.value)} />
             </Field>
           </div>
-        </Card>
-        <Card>
-          <CardTitle title="Employment" />
+        </Card> : null}
+        {step === 2 ? <Card>
+          <CardTitle title="Employment details" />
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Job title" htmlFor="jobTitle" error={errors.jobTitle}>
               <Input id="jobTitle" invalid={Boolean(errors.jobTitle)} value={form.jobTitle} onChange={(event) => set("jobTitle", event.target.value)} />
@@ -267,13 +282,16 @@ export function NewEmployeePage() {
               </Select>
             </Field>
           </div>
-        </Card>
-        <Card>
-          <CardTitle title="Pay and bank" description="Only the last four digits of an account number are kept." />
-          <div className="grid gap-4 sm:grid-cols-2">
-            <Field label="Basic salary for the period (R)" htmlFor="basic" error={errors.basic} hint="No PAYE, UIF or SDL line is created. This demonstration does not calculate statutory amounts.">
+        </Card> : null}
+        {step === 3 ? <Card>
+          <CardTitle title="Salary" description="No PAYE, UIF or SDL line is created. This demonstration does not calculate statutory amounts." />
+          <Field label="Basic salary for the period (R)" htmlFor="basic" error={errors.basic}>
               <Input id="basic" inputMode="decimal" invalid={Boolean(errors.basic)} value={form.basic} onChange={(event) => set("basic", event.target.value)} />
             </Field>
+          </Card> : null}
+        {step === 4 ? <Card>
+          <CardTitle title="Bank account" description="Only the last four digits are kept. Leave the account blank if it is not known yet." />
+          <div className="grid gap-4 sm:grid-cols-2">
             <Field label="Bank" htmlFor="bank">
               <Select id="bank" value={form.bank} onChange={(event) => set("bank", event.target.value)}>
                 {["FNB", "Standard Bank", "Absa", "Nedbank", "Capitec"].map((item) => (
@@ -285,12 +303,44 @@ export function NewEmployeePage() {
               <Input id="account" value={form.account} onChange={(event) => set("account", event.target.value)} />
             </Field>
           </div>
-        </Card>
+        </Card> : null}
+        {step === 5 ? (
+          <Card>
+            <CardTitle title="Review" description="Check the record before it joins the register." />
+            <dl className="grid gap-3 text-sm sm:grid-cols-2">
+              <div><dt className="text-muted">Name</dt><dd>{form.firstName} {form.lastName}</dd></div>
+              <div><dt className="text-muted">Email</dt><dd>{form.email}</dd></div>
+              <div><dt className="text-muted">Role</dt><dd>{form.jobTitle}</dd></div>
+              <div><dt className="text-muted">Basic</dt><dd className="num">{form.basic ? `R${form.basic}` : "—"}</dd></div>
+            </dl>
+          </Card>
+        ) : null}
         <div className="flex gap-2">
-          <Button type="submit">Save employee</Button>
-          <ButtonLink to={`${base}/employees`} variant="secondary">
-            Cancel
-          </ButtonLink>
+          {step > 0 ? <Button type="button" variant="secondary" onClick={() => setStep((value) => value - 1)}>Back</Button> : null}
+          {step < 5 ? (
+            <Button type="button" onClick={() => {
+              const next: Record<string, string> = {};
+              if (step === 0) {
+                if (!form.firstName.trim()) next.firstName = "Enter a first name.";
+                if (!form.lastName.trim()) next.lastName = "Enter a last name.";
+              }
+              if (step === 1) {
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email)) next.email = "Enter a valid work email.";
+                if (!/^(\+27|0)\d{9}$/.test(form.mobile.replaceAll(" ", ""))) next.mobile = "Use a South African number, for example 082 000 0142.";
+              }
+              if (step === 2) {
+                if (!form.jobTitle.trim()) next.jobTitle = "Enter a job title.";
+                if (!form.startDate) next.startDate = "Enter a start date.";
+              }
+              if (step === 3) {
+                const basic = Number(form.basic);
+                if (!form.basic || Number.isNaN(basic) || basic <= 0) next.basic = "Enter a basic salary greater than zero.";
+              }
+              setErrors(next);
+              if (!Object.keys(next).length) setStep((value) => value + 1);
+            }}>Continue</Button>
+          ) : <Button type="submit">Save employee</Button>}
+          <ButtonLink to={`${base}/employees`} variant="secondary">Cancel</ButtonLink>
         </div>
       </form>
     </div>
@@ -316,7 +366,12 @@ export function EmployeeProfilePage() {
         eyebrow={employee.employeeNumber}
         title={fullName(employee)}
         description={`${employee.jobTitle} · ${employee.department} · ${employee.site}`}
-        actions={<ButtonLink to={`${base}/employees`} variant="secondary">Back to employees</ButtonLink>}
+        actions={
+          <>
+            {employee.status !== "terminated" ? <ButtonLink to={`${base}/employees/${employee.id}/terminate`} variant="danger">End employment</ButtonLink> : null}
+            <ButtonLink to={`${base}/employees`} variant="secondary">Back to employees</ButtonLink>
+          </>
+        }
       />
       <div className="flex flex-wrap items-center gap-2">
         <Badge tone={employee.status === "active" ? "success" : employee.status === "terminated" ? "neutral" : "warning"}>
@@ -329,10 +384,17 @@ export function EmployeeProfilePage() {
         onChange={setTab}
         tabs={[
           { id: "employment", label: "Employment" },
-          { id: "pay", label: "Pay" },
+          { id: "personal", label: "Personal" },
+          { id: "pay", label: "Salary" },
+          { id: "bank", label: "Bank" },
+          { id: "tax", label: "Tax" },
+          { id: "benefits", label: "Benefits" },
+          { id: "deductions", label: "Deductions" },
           { id: "leave", label: "Leave" },
+          { id: "documents", label: "Documents" },
+          { id: "history", label: "History" },
           { id: "payslips", label: "Payslips" },
-          { id: "security", label: "Protected information" },
+          { id: "security", label: "Protected" },
         ]}
       />
       {tab === "employment" ? (
@@ -347,6 +409,49 @@ export function EmployeeProfilePage() {
               { term: "Employee number", detail: employee.employeeNumber },
             ]}
           />
+        </Card>
+      ) : null}
+      {tab === "personal" ? (
+        <Card>
+          <DefinitionList items={[{ term: "Preferred record name", detail: fullName(employee) }, { term: "Email", detail: employee.email }, { term: "Mobile", detail: employee.mobile }, { term: "Identity number", detail: employee.idMasked }]} />
+        </Card>
+      ) : null}
+      {tab === "bank" ? (
+        <Card>
+          <CardTitle title="Bank account" description="The account number stays masked. A full number is not stored in this demonstration." />
+          <DefinitionList items={[{ term: "Bank", detail: employee.bank }, { term: "Account type", detail: employee.accountType }, { term: "Account", detail: employee.accountMasked }]} />
+        </Card>
+      ) : null}
+      {tab === "tax" ? (
+        <Card>
+          <CardTitle title="Tax information" description="The tax reference stays masked. PAYE on a payslip is a stored sample, not a SARS assessment." />
+          <DefinitionList items={[{ term: "Tax reference", detail: employee.taxMasked }, { term: "Taxable earnings sample", detail: employee.taxableSample > 0 ? formatRand(employee.taxableSample) : "Not supplied" }]} />
+        </Card>
+      ) : null}
+      {tab === "benefits" ? (
+        <Card>
+          <CardTitle title="Benefits" description="Fund names only. Premiums are not shown as calculated rands." />
+          <p className="text-sm">{employee.lines.some((line) => line.code.includes("MED") || line.code.includes("PENS")) ? "Umbrella Health and Southern Retirement Fund are on the current sample lines." : "No benefit fund is on the current lines."}</p>
+        </Card>
+      ) : null}
+      {tab === "deductions" ? (
+        <Card>
+          <CardTitle title="Deductions on the current lines" description="Employee deductions only. Employer contributions are on the salary tab." />
+          {employee.lines.filter((line) => line.kind === "employee_deduction").length === 0 ? <EmptyState title="No deductions stored" body="This employee has no employee-deduction lines in the open period." /> : (
+            <ul className="space-y-2 text-sm">{employee.lines.filter((line) => line.kind === "employee_deduction").map((line) => <li key={line.id} className="flex justify-between"><span>{line.label}</span><span className="num">{formatRand(line.amount)}</span></li>)}</ul>
+          )}
+        </Card>
+      ) : null}
+      {tab === "documents" ? (
+        <Card>
+          <CardTitle title="Employment documents" description="Contracts and letters for this person. Restricted files are access-logged." action={<ButtonLink to={`${base}/documents`} size="sm" variant="secondary">Open the library</ButtonLink>} />
+          <p className="text-sm text-muted">A contract preview does not include an identity number.</p>
+        </Card>
+      ) : null}
+      {tab === "history" ? (
+        <Card>
+          <CardTitle title="Employment and salary history" description="Dates already on the record, plus stored payslip nets. A salary review is not calculated here." />
+          <DefinitionList items={[{ term: "Started", detail: formatDate(employee.startDate) }, { term: "Ended", detail: employee.endDate ? formatDate(employee.endDate) : "Current" }, { term: "Current gross sample", detail: formatRand(totals.gross) }]} />
         </Card>
       ) : null}
       {tab === "pay" ? (
@@ -424,6 +529,53 @@ export function EmployeeProfilePage() {
           />
         </Card>
       ) : null}
+    </div>
+  );
+}
+
+export function TerminateEmployeePage() {
+  const { employeeId = "" } = useParams();
+  const { employees } = useOrg();
+  const { dispatch } = useApp();
+  const { base, actor } = useWorkspace();
+  const employee = employees.find((item) => item.id === employeeId);
+  const [endDate, setEndDate] = useState("2026-11-30");
+  const [reason, setReason] = useState("");
+  const [error, setError] = useState("");
+  const [confirm, setConfirm] = useState(false);
+  if (!employee) return <ErrorState title="Employee not found" body="This person is not on the current register." />;
+  if (employee.status === "terminated") {
+    return (
+      <div className="space-y-4">
+        <PageHeader title={`${fullName(employee)} is archived`} description={employee.endDate ? `Employment ended ${formatDate(employee.endDate)}.` : "The record is on the archived list."} />
+        <ButtonLink to={`${base}/employees/archived`}>View archived employees</ButtonLink>
+      </div>
+    );
+  }
+  return (
+    <div className="mx-auto max-w-2xl space-y-6">
+      <PageHeader eyebrow={employee.employeeNumber} title={`End employment for ${fullName(employee)}`} description="The final pay is not calculated here. The person moves to the archived register and drops out of new runs." />
+      <Card>
+        <div className="space-y-4">
+          <Field label="Last working day" htmlFor="end-date" required><Input id="end-date" type="date" value={endDate} onChange={(event) => setEndDate(event.target.value)} /></Field>
+          <Field label="Reason" htmlFor="reason" required error={error} hint="Visible to payroll administrators. It is not printed on the payslip.">
+            <Input id="reason" value={reason} invalid={Boolean(error)} onChange={(event) => setReason(event.target.value)} />
+          </Field>
+          <Button variant="danger" onClick={() => { if (reason.trim().length < 3 || !endDate) { setError("Enter a reason and a last day."); return; } setError(""); setConfirm(true); }}>Archive employee</Button>
+        </div>
+      </Card>
+      <ConfirmDialog
+        open={confirm}
+        title="Archive this employee?"
+        body={`${fullName(employee)} will leave the active register. Open payroll totals that already include them stay as stored samples.`}
+        confirmLabel="Archive"
+        tone="danger"
+        onClose={() => setConfirm(false)}
+        onConfirm={() => {
+          dispatch({ type: "terminate-employee", employeeId: employee.id, endDate, reason: reason.trim(), actor });
+          setConfirm(false);
+        }}
+      />
     </div>
   );
 }

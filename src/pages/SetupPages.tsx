@@ -5,6 +5,7 @@ import { formatRand, uid } from "../format.ts";
 import { useApp, useOrg } from "../state.tsx";
 import { useWorkspace } from "../workspace.ts";
 import { Badge, Button, Card, CardTitle, ConfirmDialog, EmptyState, Field, Input, PageHeader, Tabs, Textarea } from "../ui.tsx";
+import { FlowDiagram } from "../visuals.tsx";
 
 export function EarningsPage() {
   const { codes, orgId, org } = useOrg();
@@ -13,7 +14,7 @@ export function EarningsPage() {
   const [tab, setTab] = useState("active");
   const [open, setOpen] = useState(false);
   const [retire, setRetire] = useState<PayCode | null>(null);
-  const [form, setForm] = useState({ code: "", label: "", kind: "earning" as LineKind, description: "" });
+  const [form, setForm] = useState({ code: "", label: "", kind: "earning" as LineKind, description: "", treatment: "Included in taxable earnings", timing: "Recurring" });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const visible = codes.filter((code) => (tab === "active" ? code.active : !code.active));
 
@@ -28,10 +29,10 @@ export function EarningsPage() {
     dispatch({
       type: "add-code",
       actor,
-      code: { id: uid("code"), orgId, code: form.code, label: form.label.trim(), kind: form.kind, active: true, description: form.description.trim() || "Added in this demonstration." },
+      code: { id: uid("code"), orgId, code: form.code, label: form.label.trim(), kind: form.kind, active: true, description: form.description.trim() || `${form.timing}. ${form.treatment}. Added in this demonstration.` },
     });
     setOpen(false);
-    setForm({ code: "", label: "", kind: "earning", description: "" });
+    setForm({ code: "", label: "", kind: "earning", description: "", treatment: "Included in taxable earnings", timing: "Recurring" });
   }
 
   return (
@@ -42,6 +43,10 @@ export function EarningsPage() {
         description="Employee deductions and employer contributions are different code types. An employer cost cannot be saved as a deduction."
         actions={<Button onClick={() => setOpen(true)}>Add code</Button>}
       />
+      <Card>
+        <CardTitle title="How a pay code is grouped" description="An earning increases gross. An employee deduction reduces net. An employer contribution never reduces net." />
+        <FlowDiagram />
+      </Card>
       <Tabs
         value={tab}
         onChange={setTab}
@@ -108,6 +113,22 @@ export function EarningsPage() {
                 ))}
               </div>
             </fieldset>
+            <div className="grid gap-4 sm:grid-cols-2">
+              <Field label="Tax treatment" htmlFor="treatment" hint="A label for reviewers. It does not calculate tax.">
+                <select id="treatment" className="h-10 w-full rounded-lg border border-line bg-white px-3 text-sm" value={form.treatment} onChange={(event) => setForm({ ...form, treatment: event.target.value })}>
+                  <option>Included in taxable earnings</option>
+                  <option>Employee deduction</option>
+                  <option>Employer contribution</option>
+                  <option>Not a tax item</option>
+                </select>
+              </Field>
+              <Field label="When it applies" htmlFor="timing">
+                <select id="timing" className="h-10 w-full rounded-lg border border-line bg-white px-3 text-sm" value={form.timing} onChange={(event) => setForm({ ...form, timing: event.target.value })}>
+                  <option>Recurring</option>
+                  <option>Once-off</option>
+                </select>
+              </Field>
+            </div>
             <Field label="Description" htmlFor="code-description">
               <Textarea id="code-description" value={form.description} onChange={(event) => setForm({ ...form, description: event.target.value })} />
             </Field>
