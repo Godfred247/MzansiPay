@@ -1,16 +1,15 @@
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Link, NavLink, Outlet, useLocation, useParams } from "react-router-dom";
-import { Check, FileText, Home, Menu, UserRound, Users, Wallet } from "lucide-react";
-import type { LeaveType } from "../domain.ts";
-import { fullName, leaveTone, payslipCatalogue, runEmployees, runStatusMeta, runTotals, sumLines } from "../domain.ts";
-import { DEMO_DATE_LONG, formatDate, formatRand, inclusiveDays, uid } from "../format.ts";
-import { IllustrativeBanner, PayslipPaper } from "../finance.tsx";
+import { Check, Home, Menu, Users, Wallet } from "lucide-react";
+import { fullName, payslipCatalogue, runEmployees, runStatusMeta, runTotals, sumLines } from "../domain.ts";
+import { DEMO_DATE_LONG, formatDate, formatRand } from "../format.ts";
+import { IllustrativeBanner } from "../finance.tsx";
 import { HISTORY } from "../sample.ts";
 import { useApp, useOrg } from "../state.tsx";
-import { EMPLOYEE_USER, EMPLOYER_USER } from "../workspace.ts";
-import { Badge, Button, ConfirmDialog, EmptyState, ErrorState, Field, Input, Select, Textarea, Toasts, cn } from "../ui.tsx";
+import { EMPLOYER_USER } from "../workspace.ts";
+import { Badge, Button, ConfirmDialog, EmptyState, ErrorState, Field, Input, Textarea, Toasts, cn } from "../ui.tsx";
 
-function Phone({ caption, children }: { caption: string; children: ReactNode }) {
+export function Phone({ caption, children }: { caption: string; children: ReactNode }) {
   return (
     <div className="min-h-dvh bg-[#E6EDF5] md:flex md:flex-col md:items-center md:justify-center md:px-6 md:py-6">
       <p className="mb-3 hidden text-center text-sm text-muted md:block">{caption}</p>
@@ -22,7 +21,7 @@ function Phone({ caption, children }: { caption: string; children: ReactNode }) 
   );
 }
 
-function TabBar({ items, active }: { items: { id: string; to: string; label: string; icon: typeof Home; badge?: number }[]; active: string }) {
+export function TabBar({ items, active }: { items: { id: string; to: string; label: string; icon: typeof Home; badge?: number }[]; active: string }) {
   return (
     <nav className="grid shrink-0 grid-cols-5 border-t border-line bg-white pb-[max(8px,env(safe-area-inset-bottom))]" aria-label="Mobile">
       {items.map((item) => (
@@ -418,236 +417,3 @@ export function MobileMoneyList({ kind }: { kind: "payments" | "compliance" | "b
   );
 }
 
-function employeeSection(pathname: string) {
-  if (pathname.startsWith("/me/payslips")) return "payslips";
-  if (pathname.startsWith("/me/leave")) return "leave";
-  if (pathname.startsWith("/me/documents")) return "documents";
-  if (pathname.startsWith("/me/profile")) return "profile";
-  return "home";
-}
-
-export function EmployeeMobileLayout() {
-  const { pathname } = useLocation();
-  return (
-    <Phone caption={`Employee mobile · ${EMPLOYEE_USER.name} · own record only`}>
-      <div className="min-h-0 flex-1 overflow-y-auto">
-        <Outlet />
-      </div>
-      <TabBar
-        active={employeeSection(pathname)}
-        items={[
-          { id: "home", to: "/me", label: "Home", icon: Home },
-          { id: "payslips", to: "/me/payslips", label: "Payslips", icon: FileText },
-          { id: "leave", to: "/me/leave", label: "Leave", icon: Check },
-          { id: "documents", to: "/me/documents", label: "Documents", icon: Wallet },
-          { id: "profile", to: "/me/profile", label: "Profile", icon: UserRound },
-        ]}
-      />
-    </Phone>
-  );
-}
-
-function useSelf() {
-  const { state } = useApp();
-  const employee = state.employees.find((item) => item.id === EMPLOYEE_USER.employeeId);
-  const slips = payslipCatalogue(state.employees, state.runs, HISTORY).filter((slip) => slip.employee.id === EMPLOYEE_USER.employeeId);
-  const requests = state.leave.filter((request) => request.employeeId === EMPLOYEE_USER.employeeId);
-  return { employee, slips, requests, state };
-}
-
-export function EmployeeHome() {
-  const { employee, slips } = useSelf();
-  const current = slips.find((slip) => slip.periodLabel.includes("November"));
-  if (!employee || !current) return <div className="p-4"><ErrorState title="Record unavailable" body="Your employee record could not be loaded." /></div>;
-  const net = sumLines(current.lines).net;
-  return (
-    <div>
-      <header className="bg-navy px-5 pt-8 pb-16 text-white">
-        <p className="text-sm text-white/70">Khanyisa Retail</p>
-        <h1 className="mt-1 text-2xl font-semibold">Good evening, Thandiwe</h1>
-        <p className="text-sm text-white/70">{DEMO_DATE_LONG}</p>
-      </header>
-      <div className="-mt-10 space-y-3 px-4 pb-6">
-        <section className="rounded-2xl border border-line bg-white p-4">
-          <p className="text-xs text-muted">Next payday · {formatDate(current.payDate)}</p>
-          <p className="mt-1 text-sm text-muted">November net salary · {current.final ? "Paid" : "In review, not final"}</p>
-          <p className="num mt-2 text-3xl font-semibold text-teal-700">{formatRand(net)}</p>
-          <p className="mt-2 text-xs leading-5 text-muted">Illustrative. Employer contributions are not deducted from this amount.</p>
-          <Link to={`/me/payslips/${current.id}`} className="mt-4 flex h-11 items-center justify-center rounded-lg bg-blue-600 text-sm font-medium text-white">View payslip</Link>
-        </section>
-        <section className="rounded-2xl border border-line bg-white p-4 text-sm">
-          <h2 className="font-semibold">Leave still on record</h2>
-          <div className="mt-2 space-y-1">
-            <Row label="Annual" value={`${employee.leave.annual} days`} />
-            <Row label="Sick" value={`${employee.leave.sick} days`} />
-            <Row label="Family responsibility" value={`${employee.leave.family} days`} />
-          </div>
-        </section>
-      </div>
-    </div>
-  );
-}
-
-export function EmployeePayslips() {
-  const { slips } = useSelf();
-  return (
-    <div className="px-4 py-5">
-      <h1 className="text-xl font-semibold">Payslips</h1>
-      <p className="mt-1 text-sm text-muted">Only your payslips are listed.</p>
-      <ul className="mt-3 space-y-2">
-        {slips.map((slip) => (
-          <li key={slip.id}>
-            <Link to={`/me/payslips/${slip.id}`} className="block rounded-2xl border border-line bg-white p-4">
-              <div className="flex items-center justify-between">
-                <span className="font-medium">{slip.periodLabel}</span>
-                <Badge tone={slip.final ? "success" : "warning"}>{slip.final ? "Paid" : "Not final"}</Badge>
-              </div>
-              <p className="num mt-2 text-lg font-semibold text-teal-700">{formatRand(sumLines(slip.lines).net)}</p>
-            </Link>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export function EmployeePayslip() {
-  const { payslipId } = useParams();
-  const { slips } = useSelf();
-  const { state } = useApp();
-  const slip = slips.find((item) => item.id === payslipId);
-  if (!slip) return <div className="p-4"><ErrorState title="This payslip is not yours" body="You can only open payslips on your own record." /></div>;
-  const org = state.orgs.khanyisa;
-  return (
-    <div className="px-3 py-4">
-      <Link to="/me/payslips" className="text-sm font-medium text-blue-700">Payslips</Link>
-      <div className="mt-3">
-        <PayslipPaper slip={slip} companyName={org.legalName} companyMeta={org.address.join(", ")} />
-      </div>
-    </div>
-  );
-}
-
-export function EmployeeLeave() {
-  const { employee, requests } = useSelf();
-  const { dispatch } = useApp();
-  const [form, setForm] = useState({ type: "Annual" as LeaveType, start: "", end: "", note: "" });
-  const [errors, setErrors] = useState<Record<string, string>>({});
-  const [done, setDone] = useState("");
-  if (!employee) return null;
-  function submit(event: FormEvent) {
-    event.preventDefault();
-    const next: Record<string, string> = {};
-    if (!form.start || !form.end) next.dates = "Enter a start and end date.";
-    const days = form.start && form.end ? inclusiveDays(form.start, form.end) : 0;
-    if (days <= 0) next.dates = "The end date must be on or after the start date.";
-    if (form.type === "Annual" && days > employee!.leave.annual) next.dates = `This is longer than the annual balance on record (${employee!.leave.annual} days).`;
-    if (form.type === "Family responsibility" && days > employee!.leave.family) next.dates = `This is longer than the family responsibility balance on record (${employee!.leave.family} days).`;
-    if (form.type === "Sick" && form.note.trim().length < 3) next.note = "Add a short note for sick leave.";
-    setErrors(next);
-    if (Object.keys(next).length) return;
-    dispatch({
-      type: "add-leave",
-      actor: EMPLOYEE_USER.name,
-      request: {
-        id: uid("leave"),
-        orgId: "khanyisa",
-        employeeId: employee!.id,
-        type: form.type,
-        start: form.start,
-        end: form.end,
-        days,
-        status: "pending",
-        note: form.note.trim() || "Requested from the employee app.",
-      },
-    });
-    setDone(`${form.type} leave for ${days} calendar days is with Amara Dube and Helen Okonkwo.`);
-    setForm({ type: "Annual", start: "", end: "", note: "" });
-  }
-  if (done) {
-    return (
-      <div className="space-y-3 px-4 py-5">
-        <h1 className="text-xl font-semibold">Request sent</h1>
-        <p className="text-sm leading-6 text-muted">{done}</p>
-        <Button onClick={() => setDone("")}>Request another</Button>
-      </div>
-    );
-  }
-  return (
-    <div className="space-y-4 px-4 py-5">
-      <h1 className="text-xl font-semibold">Leave</h1>
-      <form className="space-y-3 rounded-2xl border border-line bg-white p-4" onSubmit={submit} noValidate>
-        <Field label="Type" htmlFor="leave-type">
-          <Select id="leave-type" value={form.type} onChange={(event) => setForm({ ...form, type: event.target.value as LeaveType })}>
-            <option>Annual</option>
-            <option>Sick</option>
-            <option>Family responsibility</option>
-            <option>Maternity</option>
-          </Select>
-        </Field>
-        <Field label="From" htmlFor="leave-from" error={errors.dates}>
-          <Input id="leave-from" type="date" invalid={Boolean(errors.dates)} value={form.start} onChange={(event) => setForm({ ...form, start: event.target.value })} />
-        </Field>
-        <Field label="To" htmlFor="leave-to">
-          <Input id="leave-to" type="date" invalid={Boolean(errors.dates)} value={form.end} onChange={(event) => setForm({ ...form, end: event.target.value })} />
-        </Field>
-        <Field label="Note" htmlFor="leave-note" error={errors.note} hint="Calendar days. Public holidays are not deducted in this demonstration.">
-          <Textarea id="leave-note" invalid={Boolean(errors.note)} value={form.note} onChange={(event) => setForm({ ...form, note: event.target.value })} />
-        </Field>
-        <Button type="submit" className="w-full">Submit request</Button>
-      </form>
-      <ul className="space-y-2">
-        {requests.map((request) => (
-          <li key={request.id} className="rounded-2xl border border-line bg-white p-4 text-sm">
-            <div className="flex items-center justify-between">
-              <span className="font-medium">{request.type}</span>
-              <Badge tone={leaveTone(request.status)}>{request.status}</Badge>
-            </div>
-            <p className="text-muted">{formatDate(request.start)} – {formatDate(request.end)}</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export function EmployeeDocuments() {
-  const { state } = useApp();
-  const docs = state.documents.filter((document) => document.owner === EMPLOYEE_USER.employeeId);
-  return (
-    <div className="px-4 py-5">
-      <h1 className="text-xl font-semibold">Documents</h1>
-      <p className="mt-1 text-sm text-muted">Files on your record. Company documents are not shown here.</p>
-      {docs.length === 0 ? <div className="mt-4"><EmptyState title="No documents" body="Your contracts and proofs of account will appear here." /></div> : null}
-      <ul className="mt-3 space-y-2">
-        {docs.map((document) => (
-          <li key={document.id} className="rounded-2xl border border-line bg-white p-4">
-            <p className="font-medium">{document.name}</p>
-            <p className="text-xs text-muted">{document.category} · Restricted</p>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
-}
-
-export function EmployeeProfile() {
-  const { employee } = useSelf();
-  if (!employee) return null;
-  return (
-    <div className="space-y-3 px-4 py-5">
-      <h1 className="text-xl font-semibold">Profile</h1>
-      <p className="text-sm text-muted">You only see your own record.</p>
-      <div className="space-y-2 rounded-2xl border border-line bg-white p-4 text-sm">
-        <Row label="Employee number" value={employee.employeeNumber} />
-        <Row label="Role" value={employee.jobTitle} />
-        <Row label="Email" value={employee.email} />
-        <Row label="Mobile" value={employee.mobile} />
-        <Row label="Identity number" value={employee.idMasked} />
-        <Row label="Tax reference" value={employee.taxMasked} />
-        <Row label="Bank" value={`${employee.bank} ${employee.accountMasked}`} />
-      </div>
-      <Link to="/" className="inline-flex text-sm font-medium text-blue-700">Sign out</Link>
-    </div>
-  );
-}

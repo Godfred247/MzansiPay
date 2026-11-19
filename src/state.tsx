@@ -65,6 +65,7 @@ type Action =
   | { type: "add-leave"; request: LeaveRequest; actor: string }
   | { type: "add-employee"; employee: Employee; actor: string }
   | { type: "terminate-employee"; employeeId: string; endDate: string; reason: string; actor: string }
+  | { type: "update-employee-mobile"; employeeId: string; mobile: string; actor: string }
   | { type: "add-code"; code: PayCode; actor: string }
   | { type: "deactivate-code"; id: string; actor: string }
   | { type: "add-user"; user: OrgUser; actor: string }
@@ -351,6 +352,15 @@ function reducer(state: State, action: Action): State {
         },
         `${employee.firstName} ${employee.lastName} is now on the archived register.`,
         { actor: action.actor, action: "Archived employee", detail: `${employee.firstName} ${employee.lastName}. ${action.reason}`, orgId: employee.orgId },
+      );
+    }
+    case "update-employee-mobile": {
+      const employee = state.employees.find((item) => item.id === action.employeeId);
+      if (!employee) return state;
+      return note(
+        { ...state, employees: state.employees.map((item) => (item.id === employee.id ? { ...item, mobile: action.mobile } : item)) },
+        `${employee.firstName}'s mobile number was updated after approval.`,
+        { actor: action.actor, action: "Updated employee contact", detail: `${employee.firstName} ${employee.lastName} mobile updated after an approved request.`, orgId: employee.orgId },
       );
     }
     case "add-code":

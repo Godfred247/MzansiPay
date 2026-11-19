@@ -475,6 +475,30 @@ export const PAYMENTS: PaymentBatch[] = [
 
 export const LEAVE: LeaveRequest[] = [
   {
+    id: "leave-thandiwe-nov",
+    orgId: "khanyisa",
+    employeeId: "thandiwe",
+    type: "Annual",
+    start: "2026-11-26",
+    end: "2026-11-27",
+    days: 2,
+    status: "approved",
+    note: "Two days after payday.",
+    decisionNote: "Approved by Amara Dube.",
+  },
+  {
+    id: "leave-thandiwe-oct",
+    orgId: "khanyisa",
+    employeeId: "thandiwe",
+    type: "Sick",
+    start: "2026-10-14",
+    end: "2026-10-14",
+    days: 1,
+    status: "declined",
+    note: "Clinic visit.",
+    decisionNote: "Declined by Helen Okonkwo. Send it again with a clinic note.",
+  },
+  {
     id: "leave-sipho",
     orgId: "khanyisa",
     employeeId: "sipho",

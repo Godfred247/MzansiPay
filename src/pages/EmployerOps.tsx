@@ -640,7 +640,7 @@ export function ApprovalQueuePage() {
   const pendingLeave = leave.filter((request) => request.status === "pending");
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow={org.tradingName} title="Approval queue" description="Payroll and leave waiting on this organisation. A practice user can prepare a run. The employer approves it." />
+      <PageHeader eyebrow={org.tradingName} title="Approval queue" description="Payroll and leave waiting on this organisation. A practice user can prepare a run. The employer approves it." actions={<ButtonLink to={`${base}/employee-requests`} variant="secondary">Employee requests</ButtonLink>} />
       {payroll.length === 0 && pendingLeave.length === 0 ? <EmptyState title="The queue is clear" body="Submitted payroll and pending leave will appear here." /> : null}
       {payroll.map((run) => (
         <Card key={run.id}>

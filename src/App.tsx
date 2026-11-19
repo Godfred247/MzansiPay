@@ -19,13 +19,6 @@ import { DesignSystemPage } from "./pages/DesignSystem.tsx";
 import { ArchivedEmployeesPage, EmployeeProfilePage, EmployeesPage, NewEmployeePage, TerminateEmployeePage } from "./pages/Employees.tsx";
 import { LeavePage } from "./pages/Leave.tsx";
 import {
-  EmployeeDocuments,
-  EmployeeHome,
-  EmployeeLeave,
-  EmployeeMobileLayout,
-  EmployeePayslip,
-  EmployeePayslips,
-  EmployeeProfile,
   EmployerApprovals,
   EmployerEmployeeDetail,
   EmployerEmployees,
@@ -38,6 +31,24 @@ import {
   MobileMoneyList,
   MobilePayslips,
 } from "./pages/Mobile.tsx";
+import {
+  EmployeeCorrectionNew,
+  EmployeeCorrections,
+  EmployeeHome,
+  EmployeeLeave,
+  EmployeeLeaveCalendar,
+  EmployeeLeaveRequest,
+  EmployeeMobileLayout,
+  EmployeeNotifications,
+  EmployeePayslip,
+  EmployeePayslipPreview,
+  EmployeePayslips,
+  EmployeeProfile,
+  EmployeeProfileEdit,
+  EmployeeRequestsPage,
+  EmployeeTax,
+  EmployeeTaxDetail,
+} from "./pages/EmployeeSelf.tsx";
 import {
   ApprovalDetailPage,
   ApprovalQueuePage,
@@ -158,6 +169,7 @@ function EmployerRoutes() {
       <Route path="payroll/:runId/submit" element={<PayrollSubmitPage />} />
       <Route path="payroll/:runId" element={<PayrollRunPage />} />
       <Route path="approvals" element={<ApprovalQueuePage />} />
+      <Route path="employee-requests" element={<EmployeeRequestsPage />} />
       <Route path="approvals/:runId" element={<ApprovalDetailPage />} />
       <Route path="payslips" element={<PayslipsPage />} />
       <Route path="payslips/:payslipId" element={<PayslipPage />} />
@@ -301,11 +313,19 @@ export default function App() {
       </Route>
       <Route path="/me" element={<EmployeeMobileLayout />}>
         <Route index element={<EmployeeHome />} />
+        <Route path="notifications" element={<EmployeeNotifications />} />
         <Route path="payslips" element={<EmployeePayslips />} />
         <Route path="payslips/:payslipId" element={<EmployeePayslip />} />
+        <Route path="payslips/:payslipId/preview" element={<EmployeePayslipPreview />} />
+        <Route path="tax" element={<EmployeeTax />} />
+        <Route path="tax/:yearId" element={<EmployeeTaxDetail />} />
         <Route path="leave" element={<EmployeeLeave />} />
-        <Route path="documents" element={<EmployeeDocuments />} />
+        <Route path="leave/calendar" element={<EmployeeLeaveCalendar />} />
+        <Route path="leave/request" element={<EmployeeLeaveRequest />} />
         <Route path="profile" element={<EmployeeProfile />} />
+        <Route path="profile/edit" element={<EmployeeProfileEdit />} />
+        <Route path="corrections" element={<EmployeeCorrections />} />
+        <Route path="corrections/new" element={<EmployeeCorrectionNew />} />
       </Route>
       <Route
         path="*"
