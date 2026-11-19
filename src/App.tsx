@@ -1,6 +1,6 @@
 import { useEffect } from "react";
 import { Link, Navigate, Route, Routes, useParams } from "react-router-dom";
-import { BillingPage, CompliancePage, DocumentsPage, PaymentsPage, ReportViewPage, ReportsPage, SettingsPage } from "./pages/AdminPages.tsx";
+import { BillingPage, DocumentsPage, PaymentsPage, ReportViewPage, ReportsPage, SettingsPage } from "./pages/AdminPages.tsx";
 import {
   CalendarPage,
   ClientOverviewPage,
@@ -47,7 +47,6 @@ import {
   PayrollCalendarPage,
   PayrollComparePage,
   PayrollCreatePage,
-  PayrollEmployeeCalcPage,
   PayrollExceptionsPage,
   PayrollFinalPage,
   PayrollGroupCreatePage,
@@ -56,12 +55,26 @@ import {
   PayrollPendingPage,
   PayrollRejectedPage,
   PayrollSubmitPage,
-  PayrollValidatePage,
   StructureCreatePage,
   StructureDetailPage,
   StructuresPage,
 } from "./pages/EmployerOps.tsx";
 import { PayrollListPage, PayrollRunPage } from "./pages/Payroll.tsx";
+import {
+  CalculationPage,
+  CalculationsPage,
+  CertificatePage,
+  CertificatesPage,
+  ComplianceCalendarPage,
+  CompliancePage,
+  Emp201Page,
+  Emp501Page,
+  ResolveFindingPage,
+  StatutorySummaryPage,
+  TaxRulePage,
+  TaxRulesPage,
+  ValidationPage,
+} from "./pages/Statutory.tsx";
 import { PayslipPage, PayslipsPage } from "./pages/Payslips.tsx";
 import { AccountTypePage, ForgotPasswordPage, MfaPage, ResetPasswordPage, SignUpPage, VerifyPage } from "./onboarding/auth.tsx";
 import {
@@ -138,8 +151,8 @@ function EmployerRoutes() {
       <Route path="payroll/pending" element={<PayrollPendingPage />} />
       <Route path="payroll/rejected" element={<PayrollRejectedPage />} />
       <Route path="payroll/final" element={<PayrollFinalPage />} />
-      <Route path="payroll/:runId/employee/:employeeId" element={<PayrollEmployeeCalcPage />} />
-      <Route path="payroll/:runId/validate" element={<PayrollValidatePage />} />
+      <Route path="payroll/:runId/employee/:employeeId" element={<CalculationPage />} />
+      <Route path="payroll/:runId/validate" element={<ValidationPage />} />
       <Route path="payroll/:runId/exceptions" element={<PayrollExceptionsPage />} />
       <Route path="payroll/:runId/compare" element={<PayrollComparePage />} />
       <Route path="payroll/:runId/submit" element={<PayrollSubmitPage />} />
@@ -154,6 +167,21 @@ function EmployerRoutes() {
       <Route path="earnings" element={<EarningsPage />} />
       <Route path="benefits" element={<BenefitsPage />} />
       <Route path="compliance" element={<CompliancePage />} />
+      <Route path="compliance/calendar" element={<ComplianceCalendarPage />} />
+      <Route path="compliance/paye" element={<StatutorySummaryPage kind="paye" />} />
+      <Route path="compliance/uif" element={<StatutorySummaryPage kind="uif" />} />
+      <Route path="compliance/sdl" element={<StatutorySummaryPage kind="sdl" />} />
+      <Route path="compliance/eti" element={<StatutorySummaryPage kind="eti" />} />
+      <Route path="compliance/emp201" element={<Emp201Page />} />
+      <Route path="compliance/emp501" element={<Emp501Page />} />
+      <Route path="compliance/certificates" element={<CertificatesPage />} />
+      <Route path="compliance/certificates/:employeeId" element={<CertificatePage />} />
+      <Route path="compliance/rules" element={<TaxRulesPage />} />
+      <Route path="compliance/rules/:yearId" element={<TaxRulePage />} />
+      <Route path="validation" element={<ValidationPage />} />
+      <Route path="validation/:findingId" element={<ResolveFindingPage />} />
+      <Route path="calculations" element={<CalculationsPage />} />
+      <Route path="calculations/:employeeId" element={<CalculationPage />} />
       <Route path="reports" element={<ReportsPage />} />
       <Route path="reports/:reportId" element={<ReportViewPage />} />
       <Route path="payments" element={<PaymentsPage />} />

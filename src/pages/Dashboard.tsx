@@ -159,8 +159,8 @@ export function DashboardPage() {
                   ["Salary structures", `${base}/structures`],
                   ["Payroll calendar", `${base}/payroll/calendar`],
                   ["Leave calendar", `${base}/leave/calendar`],
-                  ["Documents", `${base}/documents`],
-                  ["Approvals", `${base}/approvals`],
+                  ["Validation", `${base}/validation`],
+                  ["EMP201 worksheet", `${base}/compliance/emp201`],
                 ].map(([label, href]) => (
                   <Link key={href} to={href} className="rounded-lg border border-line px-3 py-2 text-sm font-medium hover:border-blue-200">{label}</Link>
                 ))}

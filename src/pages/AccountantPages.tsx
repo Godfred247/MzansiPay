@@ -262,7 +262,7 @@ export function PracticeCompliancePage() {
   ];
   return (
     <div className="space-y-6">
-      <PageHeader eyebrow={PRACTICE.name} title="Statutory compliance" description="A cross-client view of November EMP201 preparation. These are not SARS submissions." />
+      <PageHeader eyebrow={PRACTICE.name} title="Statutory compliance" description="A cross-client view of November EMP201 preparation. These are not SARS submissions." actions={<ButtonLink to="/a/client/khanyisa/compliance">Open Khanyisa worksheets</ButtonLink>} />
       <IllustrativeBanner />
       <Card padding={false}>
         <table className="w-full text-sm">

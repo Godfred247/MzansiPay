@@ -20,7 +20,7 @@ export function PayrollListPage() {
   return (
     <div className="space-y-6">
       <PageHeader eyebrow={org.tradingName} title="Payroll" description="Each pay frequency has its own run. Figures on a calculated run are illustrative samples." actions={<ButtonLink to={`${base}/payroll/new`}>Create run</ButtonLink>} />
-      <SectionLinks items={[{ to: `${base}/payroll/groups`, label: "Groups" }, { to: `${base}/payroll/calendar`, label: "Calendar" }, { to: `${base}/payroll/history`, label: "History" }, { to: `${base}/payroll/pending`, label: "Pending" }, { to: `${base}/payroll/final`, label: "Finalised" }, { to: `${base}/payroll/rejected`, label: "Rejected" }]} />
+      <SectionLinks items={[{ to: `${base}/payroll/groups`, label: "Groups" }, { to: `${base}/payroll/calendar`, label: "Calendar" }, { to: `${base}/payroll/history`, label: "History" }, { to: `${base}/validation`, label: "Validation" }, { to: `${base}/calculations`, label: "Calculations" }, { to: `${base}/compliance/emp201`, label: "EMP201" }]} />
       {loading ? null : runs.length === 0 ? (
         <EmptyState
           title="No payroll run is open"
